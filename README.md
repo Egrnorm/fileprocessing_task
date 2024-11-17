@@ -17,7 +17,7 @@
 ---
 ### Логин и пароль для доступа к веб-интерфейсу MinIO  
 - `admin:upupuch123`
----
+--
 - Для того, чтобы поставить свой логин/пароль нужно поменять параметры в docker-compose.yml:  
   - `MINIO_ROOT_USER=admin`  
   - `MINIO_ROOT_PASSWORD=upupuch123`  
