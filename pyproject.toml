@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "file_processing_task"                      # Имя проекта
+version = "1.0"                            # Версия проекта
+description = "Проект для анализа файлов с помощью yar правил"  # Описание проекта
+authors = ["Zghb <probel1337@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.9, <3.12"
+requests = "^2.28.1"                         # Зависимости проекта
+minio = "^7.2.10"
+py7zr = "^0.22.0"
+yara-python = "^4.5.1"
+apache-airflow = "^2.6.3"
+pendulum = "^2.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]            # Система сборки
+build-backend = "poetry.core.masonry.api"
