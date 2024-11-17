@@ -3,12 +3,12 @@
 - `https://github.com/Egrnorm/fileprocessing_task.git`  
 2. ##### Переходим в папку:  
 - `cd fileprocessing_task`  
-3. ##### Запускаем docker-compose для MinIO:  
-- `sudo docker-compose up -d`
-4. ##### Скачиваем poetry, если не установлен:  
+3. ##### Скачиваем poetry, если не установлен:  
 - `curl -sSL https://install.python-poetry.org | python3`
-5. ##### Устанавливаем зависимости:  
+4. ##### Устанавливаем зависимости:  
 - `poetry install`  
+5. ##### Запускаем docker-compose для MinIO:  
+- `sudo docker-compose up -d`  
 6. ##### Запускаем:  
 - `poetry run python -m file_processing_task.core`  
 ---
