@@ -10,8 +10,7 @@ import os
 import py7zr
 from minio import Minio
 import yara
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+
 
 MINIO_URL: str = "localhost:9000"
 MINIO_ACCESS_KEY: str = "admin"
