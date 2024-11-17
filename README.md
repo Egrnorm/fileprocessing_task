@@ -10,7 +10,7 @@
 5. ##### Устанавливаем зависимости:  
 - `poetry install`  
 6. ##### Запускаем:  
-= `poetry run python -m file_processing_task.core`  
+- `poetry run python -m file_processing_task.core`  
 ---
 ### Немного о проекте  
 Этот проект представляет собой консольную утилиту, которая скачивает файлы за определённую дату с сайта [VX-Underground](https://vx-underground.org/), загружает их в S3 хранилище MinIO, сканирует скаченные файлы с помощью [YARA правил](https://github.com/kevoreilly/CAPEv2/tree/master/data/yara/CAPE) и загружает json отчёт в S3 хранилище MinIO  
