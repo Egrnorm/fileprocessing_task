@@ -1,6 +1,6 @@
 ### Запуск  
 1. ##### Клонируем репозиторий:  
-- `https://github.com/Egrnorm/fileprocessing_task.git`  
+- `git clone -b airflow https://github.com/Egrnorm/fileprocessing_task.git`  
 2. ##### Переходим в папку:  
 - `cd fileprocessing_task`  
 3. ##### Скачиваем poetry, если не установлен:  
