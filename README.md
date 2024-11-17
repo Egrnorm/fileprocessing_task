@@ -10,13 +10,7 @@
 5. ##### Инициализируем базу данных для airflow:
 - `poetry run airflow db init`
 6. ##### Создаём пользователя airflow. Например:
-- `poetry run airflow users create \
-  --username admin \
-  --password admin \
-  --firstname YourName \
-  --lastname YourLastName \
-  --role Admin \
-  --email admin@example.com`
+- `poetry run airflow users create --username admin --password admin --firstname YourName --lastname YourLastName --role Admin --email admin@example.com`
 7. ##### Узнаём в какой папке хранятся dags в airflow:
 - `poetry run airflow config get-value core dags_folder`
 8. ##### Переносим dag.py в папку, где хранятся dags в airflow:
