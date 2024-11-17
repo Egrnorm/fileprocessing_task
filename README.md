@@ -13,10 +13,14 @@
 - `poetry run airflow users create --username admin --password admin --firstname YourName --lastname YourLastName --role Admin --email admin@example.com`
 7. ##### Узнаём в какой папке хранятся dags в airflow:
 - `poetry run airflow config get-value core dags_folder`
-8. ##### Переносим dag.py в папку, где хранятся dags в airflow:
-- `mv file_processing_task/dag.py [путь до папки]`
+8. ##### Создаём папку dags по этому пути:
+- `mkdir [путь до папки]`
 - В моём случае это:
-- `mv file_processing_task/dag.py ~/airflow/dags`
+- `mkdir ~/airflow/dags`  
+8. ##### Переносим dag.py в папку, где хранятся dags в airflow:  
+- `mv file_processing_task/dag.py [путь до папки]/dag.py`  
+- В моём случае это:  
+- `mv file_processing_task/dag.py ~/airflow/dags/dag.py`  
 9. ##### Запускаем docker-compose для MinIO:  
 - `sudo docker-compose up -d`  
 10. ##### Запускаем веб-сервер airflow:  
