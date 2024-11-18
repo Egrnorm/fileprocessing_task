@@ -3,7 +3,7 @@ import sys
 import threading
 from datetime import datetime,timedelta
 from time import sleep
-from typing import List
+from typing import List, Optional, Dict
 import minio.error
 import requests
 import os
@@ -21,67 +21,50 @@ MINIO_BUCKET_REPORTS: str = "scan-reports"
 
 
 
-def parse_data(date_input: str):
-    date_parts = date_input.split('.')
-    year = date_parts[0]
-    month = date_parts[1]
-    day = date_parts[2]
-    date_array = [year, month, day]
+def parse_data(date_input: str) -> Optional[List[str]]:
+    date_parts: List[str] = date_input.split('.')
+    year: str = date_parts[0]
+    month: str = date_parts[1]
+    day: str = date_parts[2]
+    date_array: List[str] = [year, month, day]
     try:
         parsed_data = datetime.strptime(date_input, "%Y.%m.%d").date()
         print(f"Вы ввели дату: {parsed_data}")
         return date_array
     except ValueError:
-        print("!!!!Введите дату в правильном формате (ГГГГ.ММ.ДД)")
+        print("[ERROR] Введите дату в правильном формате (ГГГГ.ММ.ДД)")
 
 
-def compile_url_and_filename(date_array: List[str]):
-    year = date_array[0]
-    month = date_array[1]
-    day = date_array[2]
+def compile_url_and_filename(date_array: List[str]) -> (str,str):
+    year: str = date_array[0]
+    month: str = date_array[1]
+    day: str = date_array[2]
 
-    url = f"https://samples.vx-underground.org/Samples/VirusSign%20Collection/{year}.{month}/Virussign.{year}.{month}.{day}.7z"
-    archive_name = f"Virussign.{year}.{month}.{day}.7z"
+    url: str = f"https://samples.vx-underground.org/Samples/VirusSign%20Collection/{year}.{month}/Virussign.{year}.{month}.{day}.7z"
+    archive_name: str = f"Virussign.{year}.{month}.{day}.7z"
     return url, archive_name
 
-def animation(stop_event: threading.Event, state: bool):
+def animation(stop_event: threading.Event, state: int) -> None:
+    animation: List[str]
+    index: int = 0
+
     if state == 0:
         animation = ["Скачивание файла[\\]", "Скачивание файла[|]", "Скачивание файла[/]", "Скачивание файла[—]"]
-        index = 0
-
-        while not stop_event.is_set():
-
-            sys.stdout.write(f"\r{animation[index]}")
-            sys.stdout.flush()
-
-            index = (index+1) % len(animation)
-
-            sleep(0.3)
-    if state == 1:
+    elif state == 1:
         animation = ["Разархивирование[\\]", "Разархивирование[|]", "Разархивирование[/]", "Разархивирование[—]"]
-        index = 0
-
-        while not stop_event.is_set():
-            sys.stdout.write(f"\r{animation[index]}")
-            sys.stdout.flush()
-
-            index = (index + 1) % len(animation)
-
-            sleep(0.3)
-    if state == 2:
+    elif state == 2:
         animation = ["Cкачивание архива[\\]", "Cкачивание архива[|]", "Cкачивание архива[/]", "Cкачивание архива[—]"]
-        index = 0
+    else:
+        return
 
-        while not stop_event.is_set():
-            sys.stdout.write(f"\r{animation[index]}")
-            sys.stdout.flush()
-
-            index = (index + 1) % len(animation)
-
-            sleep(0.3)
+    while not stop_event.is_set():
+        sys.stdout.write(f"\r{animation[index]}")
+        sys.stdout.flush()
+        index = (index + 1) % len(animation)
+        sleep(0.3)
 
 
-def download(url: str, destination_path: str, end_message: str = "", show_animation: bool = True, anim_type: int = 0):
+def download(url: str, destination_path: str, end_message: str = "", show_animation: bool = True, anim_type: int = 0) -> Optional[bool]:
     if os.path.exists(destination_path):
         print(f"Файл {destination_path} уже существует. Пропуск скачивания.")
         return
@@ -119,14 +102,14 @@ def download(url: str, destination_path: str, end_message: str = "", show_animat
         sys.stdout.flush()
 
 
-def download_archive(url: str, archive_name: str):
+def download_archive(url: str, archive_name: str) -> Optional[bool]:
     if os.path.exists(archive_name):
         print(f"Файл {archive_name} уже существует. Пропуск скачивания.")
         return
     end_message: str = "Архив успешно скачан\n"
     download(url, archive_name, end_message, anim_type=2)
 
-def download_yar_rules(destination_path: str, rules_url_ghAPI: str = "https://api.github.com/repos/kevoreilly/CAPEv2/contents/data/yara/CAPE"):
+def download_yar_rules(destination_path: str, rules_url_ghAPI: str = "https://api.github.com/repos/kevoreilly/CAPEv2/contents/data/yara/CAPE") -> None:
     if os.path.exists(destination_path):
         print(f"\nФайл {destination_path} уже существует. Пропуск скачивания.")
         return
@@ -138,8 +121,8 @@ def download_yar_rules(destination_path: str, rules_url_ghAPI: str = "https://ap
 
     for file_info in files_json:
         if file_info["type"] == "file" and file_info["name"].endswith(".yar"):
-            file_url = file_info["download_url"]
-            file_path = os.path.join(destination_path, file_info["name"])
+            file_url: str = file_info["download_url"]
+            file_path: str = os.path.join(destination_path, file_info["name"])
             sys.stdout.write("\r" + " " * os.get_terminal_size().columns + "\r")
             print(f"\rСкачивание правила: {file_info['name']}", end="")
             sys.stdout.flush()
@@ -148,7 +131,7 @@ def download_yar_rules(destination_path: str, rules_url_ghAPI: str = "https://ap
 
 
 
-def unzip(archive_name: str):
+def unzip(archive_name: str) -> None:
     folder_name = archive_name[:-3]
     if os.path.exists(folder_name):
         print(f"Файл {folder_name} уже существует. Пропуск скачивания.")
@@ -177,13 +160,13 @@ def unzip(archive_name: str):
         print("\rНеверный пароль")
         sys.stdout.flush()
 
-def upload(file_path: str, MINIO_BUCKET: str):
+def upload(file_path: str, MINIO_BUCKET: str) -> None:
     client = Minio(MINIO_URL, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, secure=False)
 
     if not client.bucket_exists(MINIO_BUCKET):
         client.make_bucket(MINIO_BUCKET)
 
-    object_name = os.path.basename(file_path)
+    object_name: str = os.path.basename(file_path)
 
     if object_exist(client, MINIO_BUCKET, object_name):
         sys.stdout.write("\r" + " " * os.get_terminal_size().columns + "\r")
@@ -201,14 +184,15 @@ def upload(file_path: str, MINIO_BUCKET: str):
         sys.stdout.flush()
 
 
-def upload_folder(folder_name: str):
+def upload_folder(folder_name: str) -> None:
     for file in os.listdir(folder_name):
         file_path = os.path.join(folder_name, file)
 
         upload(file_path, MINIO_BUCKET_NAME)
     sys.stdout.write("\r" + " " * os.get_terminal_size().columns + "\r")
     print(f"Папка {folder_name} была загружена в бакет {MINIO_BUCKET_NAME} вместе с её содержимым", end="")
-def object_exist(client: Minio, MINIO_BUCKET: str, object_name: str):
+
+def object_exist(client: Minio, MINIO_BUCKET: str, object_name: str) -> bool:
     try:
         client.stat_object(MINIO_BUCKET, object_name)
         return True
@@ -218,26 +202,26 @@ def object_exist(client: Minio, MINIO_BUCKET: str, object_name: str):
         else:
             raise
 
-def compile_yar_rules(rulesfolder_path: str):
-    rule_paths = {}
+def compile_yar_rules(rulesfolder_path: str) -> yara.Rules:
+    rule_paths: Dict[str, str] = {}
     for file_name in os.listdir(rulesfolder_path):
         if file_name.endswith(".yar"):
-            file_path = os.path.join(rulesfolder_path, file_name)
+            file_path: str = os.path.join(rulesfolder_path, file_name)
             rule_paths[file_name] = file_path
     if not rule_paths:
         raise ValueError("В указанной папке нету YARA правил")
 
     return yara.compile(filepaths=rule_paths)
 
-def scan_files(rules: yara.Rules, targetfolder_path: str, date_array: List[str]):
-    year = date_array[0]
-    month = date_array[1]
-    day = date_array[2]
-    output_file = f"scan_report-{year}-{month}-{day}.json"
+def scan_files(rules: yara.Rules, targetfolder_path: str, date_array: List[str]) -> str:
+    year: str = date_array[0]
+    month: str = date_array[1]
+    day: str = date_array[2]
+    output_file: str = f"scan_report-{year}-{month}-{day}.json"
 
     scan_results = []
     for file_name in os.listdir(targetfolder_path): #цикл перебора файлов вирусных для yar правил
-        file_path = os.path.join(targetfolder_path, file_name)
+        file_path: str = os.path.join(targetfolder_path, file_name)
         sys.stdout.write("\r" + " " * os.get_terminal_size().columns + "\r")
         print(f"\rСканируем файл: {file_path}", end="")
         sys.stdout.flush()
@@ -264,17 +248,19 @@ def scan_files(rules: yara.Rules, targetfolder_path: str, date_array: List[str])
     print(f"\rРезультаты сканирования сохранены в файл {output_file}")
     return output_file
 
-def start():
+def start() -> None:
     # Подготовка переменных
-    date_input = input("Введите дату в формате ГГГГ.ММ.ДД:\n")
-    date_array = parse_data(date_input)
-    year = date_array[0]
-    month = date_array[1]
-    day = date_array[2]
+    date_input: str = input("Введите дату в формате ГГГГ.ММ.ДД:\n")
+    date_array: List[str] = parse_data(date_input)
+    year: str = date_array[0]
+    month: str = date_array[1]
+    day: str = date_array[2]
+    url_archive: str
+    archive_name: str
     url_archive, archive_name = compile_url_and_filename(date_array)  # получение юрл архива для скачивания и получение названия архива
-    folder_name = archive_name[:-3]  # будущая папка разархивированного архива
-    scan_report = f"scan_report-{year}-{month}-{day}.json"  # будущий отчёт
-    yara_rules_folder = "yara-rules"  # папка с yara правилами
+    folder_name: str = archive_name[:-3]  # будущая папка разархивированного архива
+    scan_report: str = f"scan_report-{year}-{month}-{day}.json"  # будущий отчёт
+    yara_rules_folder: str = "yara-rules"  # папка с yara правилами
 
     # Скачивание архива и распаковка
     download_archive(url_archive, archive_name)
@@ -286,8 +272,8 @@ def start():
     download_yar_rules(yara_rules_folder)  # тут передаю папку которая создастся, в которой будет загружены yar правила
 
     # Компиляция правил, сканирование файлов и загрузка отчёта в MinIO S3
-    yara_rules = compile_yar_rules(yara_rules_folder)
-    scan_report = scan_files(yara_rules, folder_name, date_array)
+    yara_rules: yara.Rules = compile_yar_rules(yara_rules_folder)
+    scan_report: str = scan_files(yara_rules, folder_name, date_array)
     upload(scan_report, MINIO_BUCKET_REPORTS)
     print("\n")
 
