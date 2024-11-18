@@ -13,7 +13,7 @@
 - `poetry run airflow users create --username admin --password admin --firstname YourName --lastname YourLastName --role Admin --email admin@example.com`
 7. ##### Узнаём в какой папке хранятся dags в airflow:
 - `poetry run airflow config get-value core dags_folder`
-8. ##### Создаём папку dags по этому пути:
+8. ##### Если папка автоматически не создалась, то создаём её по пути, который нам вывела предыдущая команда:  
 - `mkdir [путь до папки]`
 - В моём случае это:
 - `mkdir ~/airflow/dags`  
