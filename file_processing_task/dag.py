@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from file_processing_task.core import start
 
 default_args = {
-    "retries": 1,
+    "retries": 8,
     "retry_delay": timedelta(minutes=1),
 }
 
